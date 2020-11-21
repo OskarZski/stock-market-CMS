@@ -2,13 +2,13 @@
 {% block content %}
 {% load humanize %}
 
-<h1>Add Stock...</h1>
+
 <br/>
 
-<form action="{% url 'portolio' %}" class="form-inline my-2 my-lg-0" method="POST">
+<form action="{% url 'portfolio' %}" class="form-inline my-2 my-lg-0" method="POST">
 		{% csrf_token %}
       <input class="form-control mr-sm-2" type="search" placeholder="Add To Portfolio" aria-label="Search" name="ticker">
-      <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Add Stock</button>
+      <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Add Symbol</button>
     </form>
 
 <br/><br/>
@@ -49,18 +49,14 @@
           <td>${{ list_item.marketValue }}</td>
 				</tr>
 			{% endfor %}
-			
-		    
-  		
-		
-	
-
-
-
-
-
-  </tbody>
+      </tbody>
+      <tfoot>
+        <td colspan="8"></td>
+        <td>Total Net Worth:</td>
+        <td>${{list_item.total}}</td>
+      </tfoot>
 </table>
+
 {% endif %}
 
 

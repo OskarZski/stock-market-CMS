@@ -11,10 +11,7 @@ def home(request):
 
 	if request.method == 'POST':
 		ticker = request.POST['ticker']
-		''' api_request = requests.get("https://cloud.iexapis.com/stable/stock/" + ticker + "/quote?token=pk_062031d20883444f9ea74e2610fe2011")      	
-		api_request2 = requests.get("https://cloud.iexapis.com/stable/mutual-funds/" + ticker + "/quote?token=pk_062031d20883444f9ea74e2610fe2011")
-		api_request.update(api_request2)'''
-		api_request = requests.get("https://api01.iq.questrade.com/v1/symbols/search?prefix=" + ticker)		
+		api_request = requests.get("https://cloud.iexapis.com/stable/stock/" + ticker + "/quote?token=pk_062031d20883444f9ea74e2610fe2011")      	
 		try:
 			api = json.loads(api_request.content)
 		except Exception as e:
@@ -24,11 +21,11 @@ def home(request):
 	else:
 		return render(request, 'home.html', {'ticker': "Enter a Ticker Symbol Above..."})
 
-def about(request):
-	return render(request, 'about.html', {})
+# def about(request):
+# 	return render(request, 'about.html', {})
 
 
-def portolio(request):
+def portfolio(request):
 	import requests 
 	import json 
 
@@ -38,7 +35,7 @@ def portolio(request):
 		if form.is_valid():
 			form.save()
 			messages.success(request, ("Stock Has Been Added!"))
-			return redirect('portolio')
+			return redirect('portfolio')
 
 	else:	
 		ticker = Stock.objects.all()
@@ -51,7 +48,7 @@ def portolio(request):
 			except Exception as e:
 				api = "Error..."
 		
-		return render(request, 'portolio.html', {'ticker': ticker, 'output': output})
+		return render(request, 'portfolio.html', {'ticker': ticker, 'output': output})
 
 
 def delete(request, stock_id):
