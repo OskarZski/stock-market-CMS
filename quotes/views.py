@@ -1,5 +1,3 @@
-# Copyright (c) 2019-2020 John Elder All Rights Reserved
-
 from django.shortcuts import render, redirect
 from .models import Stock
 from .forms import StockForm
@@ -12,6 +10,7 @@ def home(request):
 	if request.method == 'POST':
 		ticker = request.POST['ticker']
 		api_request = requests.get("https://cloud.iexapis.com/stable/stock/" + ticker + "/quote?token=pk_062031d20883444f9ea74e2610fe2011")      	
+
 		try:
 			api = json.loads(api_request.content)
 		except Exception as e:
