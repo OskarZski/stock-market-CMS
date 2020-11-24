@@ -32,6 +32,11 @@ def portfolio(request):
 		form = StockForm(request.POST or None)
 
 		if form.is_valid():
+			ticker_name = form.cleaned_data.get("ticker")
+			api_response = requests.get(f"https://cloud.iexapis.com/stable/stock/{ticker_name}/quote?token=pk_062031d20883444f9ea74e2610fe2011")
+			if api_response.status_code == 404:
+				messages.error(request, f"Couldn't find stock with ticker `{ticker_name}`!")
+				return redirect('portfolio')
 			form.save()
 			messages.success(request, ("Stock Has Been Added!"))
 			return redirect('portfolio')
