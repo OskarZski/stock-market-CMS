@@ -39,15 +39,19 @@ def portfolio(request):
 	else:	
 		ticker = Stock.objects.all()
 		output = []
+		total_net_worth = 0
 		for ticker_item in ticker:
 			api_request = requests.get("https://cloud.iexapis.com/stable/stock/" + str(ticker_item) + "/quote?token=pk_062031d20883444f9ea74e2610fe2011")
 			try:
 				api = json.loads(api_request.content)
+				api["shares_owned"] = ticker_item.shares_owned
+				api["market_value"] = round(ticker_item.shares_owned * api["latestPrice"], 2)
+				total_net_worth += api["market_value"]
 				output.append(api)
 			except Exception as e:
 				api = "Error..."
 		
-		return render(request, 'portfolio.html', {'ticker': ticker, 'output': output})
+		return render(request, 'portfolio.html', {'ticker': ticker, 'output': output, 'total_net_worth': total_net_worth})
 
 
 def delete(request, stock_id):
