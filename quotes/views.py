@@ -51,9 +51,12 @@ def portfolio(request):
 
 
 def delete(request, stock_id):
-	item = Stock.objects.get(pk=stock_id)
-	item.delete()
-	messages.success(request, ("Stock Has Been Deleted!"))
+	try:
+		item = Stock.objects.get(pk=stock_id)
+		item.delete()
+		messages.success(request, ("Stock Has Been Deleted!"))
+	except Stock.DoesNotExist:
+		messages.error(request, "Can't find stock!")
 	return redirect(portfolio)
 
 
