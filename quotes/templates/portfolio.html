@@ -47,14 +47,14 @@
           <td>${{ list_item.week52Low }}</td>
           <td>{{ list_item.shares_owned }}</td>
       
-          <td>${{ list_item.market_value }}</td>
+          <td>${{ list_item.market_value|intcomma }}</td>
 				</tr>
 			{% endfor %}
       </tbody>
       <tfoot>
         <td colspan="8"></td>
         <td>Total Net Worth:</td>
-        <td>${{ total_net_worth }}</td>
+        <td>${{ total_net_worth|intcomma }}</td>
       </tfoot>
 </table>
 
