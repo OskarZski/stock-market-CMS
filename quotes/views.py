@@ -41,14 +41,21 @@ def portfolio(request):
 			messages.success(request, ("Stock Has Been Added!"))
 			return redirect('portfolio')
 
-	else:	
+	else:
+		convert_fields = ["latestPrice", "previousClose", "marketCap", "week52High", "week52Low"]
 		ticker = Stock.objects.all()
 		output = []
 		total_net_worth = 0
 		for ticker_item in ticker:
 			api_request = requests.get("https://cloud.iexapis.com/stable/stock/" + str(ticker_item) + "/quote?token=pk_062031d20883444f9ea74e2610fe2011")
+			currency_rates_res = requests.get("https://api.exchangeratesapi.io/latest?base=USD")
 			try:
 				api = json.loads(api_request.content)
+				currency_rates = currency_rates_res.json()
+				cad_rate = currency_rates["rates"]["CAD"]
+				for field in convert_fields:
+					api[field] = round(api[field] * cad_rate, 2)
+     
 				api["shares_owned"] = ticker_item.shares_owned
 				api["market_value"] = round(ticker_item.shares_owned * api["latestPrice"], 2)
 				api["ytdChange"] *= 100
@@ -57,7 +64,7 @@ def portfolio(request):
 			except Exception as e:
 				api = "Error..."
 		
-		return render(request, 'portfolio.html', {'ticker': ticker, 'output': output, 'total_net_worth': total_net_worth})
+		return render(request, 'portfolio.html', {'ticker': ticker, 'output': output, 'total_net_worth': round(total_net_worth, 2)})
 
 
 def delete(request, stock_id):
