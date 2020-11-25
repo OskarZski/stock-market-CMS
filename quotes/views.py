@@ -51,6 +51,7 @@ def portfolio(request):
 				api = json.loads(api_request.content)
 				api["shares_owned"] = ticker_item.shares_owned
 				api["market_value"] = round(ticker_item.shares_owned * api["latestPrice"], 2)
+				api["ytdChange"] *= 100
 				total_net_worth += api["market_value"]
 				output.append(api)
 			except Exception as e:
