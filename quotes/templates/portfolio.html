@@ -8,6 +8,7 @@
 <form action="{% url 'portfolio' %}" class="form-inline my-2 my-lg-0" method="POST">
 		{% csrf_token %}
       <input class="form-control mr-sm-2" type="search" placeholder="Add To Portfolio" aria-label="Search" name="ticker">
+      <input class="form-control mr-sm-2" type="text" placeholder="Shares Owned" aria-label="Search" name="shares_owned">
       <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Add Symbol</button>
     </form>
 
@@ -44,16 +45,16 @@
 					<td>{{ list_item.ytdChange|floatformat:2  }}%</td>
 					<td>${{ list_item.week52High }}</td>
           <td>${{ list_item.week52Low }}</td>
-          <td>{{ list_item.holdings }}</td>
+          <td>{{ list_item.shares_owned }}</td>
       
-          <td>${{ list_item.marketValue }}</td>
+          <td>${{ list_item.market_value }}</td>
 				</tr>
 			{% endfor %}
       </tbody>
       <tfoot>
         <td colspan="8"></td>
         <td>Total Net Worth:</td>
-        <td>${{list_item.total}}</td>
+        <td>${{ total_net_worth }}</td>
       </tfoot>
 </table>
 
