@@ -71,6 +71,14 @@ class IEXApi(APIHandler):
 
 
 class CryptoAPI(APIHandler):
+    def ticker_available(self, ticker):
+        self.url = self.original_url.format(ticker)
+        try:
+            self.get()
+        except HTTP404NotFound:
+            return False
+        return True
+
     def process_data(self, data):
         self.url = self.original_url.format(data["ticker"])
         self.get()

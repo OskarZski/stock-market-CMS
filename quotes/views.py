@@ -43,14 +43,20 @@ def portfolio(request):
 
     if request.method == "POST":
         form = StockForm(request.POST or None)
-        print(request.POST)
-        print(form.is_valid())
         if form.is_valid():
-            print(form.cleaned_data)
             ticker_name = form.cleaned_data.get("ticker")
-            if not iexapi.ticker_available(ticker_name):
+            currency_type = form.cleaned_data.get("currency_type")
+            if currency_type == "stock" and not iexapi.ticker_available(ticker_name):
                 messages.error(
                     request, f"Couldn't find stock with ticker `{ticker_name}`!"
+                )
+                return redirect("portfolio")
+
+            elif currency_type == "crypto" and not coins_api.ticker_available(
+                ticker_name
+            ):
+                messages.error(
+                    request, f"Couldn't find cryptocurrency with name `{ticker_name}`!"
                 )
                 return redirect("portfolio")
             form.save()
