@@ -39,11 +39,10 @@
         </tr>
     </thead>
     <tbody>
-        {% if ticker %}
 
 
 
-        {% for list_item in output %}
+        {% for list_item in output_stock %}
         <tr>
             <th scope="row">{{ list_item.companyName }}</th>
             <td>{{ list_item.symbol }}</td>
@@ -61,13 +60,12 @@
     <tfoot>
         <td colspan="8"></td>
         <td>Total Net Worth:</td>
-        <td>${{ total_net_worth|intcomma }}</td>
+        <td>${{ stock_net_worth|intcomma }}</td>
     </tfoot>
 </table>
 
 
 
-{% endif %}
 
 <table class="table table-striped table-bordered table-hover">
     <thead class="thead-dark">
@@ -84,9 +82,8 @@
         </tr>
     </thead>
     <tbody>
-        {% if ticker %}
 
-        {% for list_item in output %}
+        {% for list_item in output_crypto %}
         <tr>
             <th scope="row">{{ list_item.name }}</th>
             <td>{{ list_item.symbol }}</td>
@@ -103,13 +100,12 @@
     <tfoot>
         <td colspan="8"></td>
         <td>Total Net Worth:</td>
-        <td>${{ total_net_worth|intcomma }}</td>
+        <td>${{ crypto_net_worth|intcomma }}</td>
     </tfoot>
 </table>
 
 
 
-{% endif %}
 
 
 

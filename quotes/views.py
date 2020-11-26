@@ -66,6 +66,7 @@ def portfolio(request):
     else:
         ticker = Stock.objects.all()
         output = []
+        output_crypto = []
         stock_net_worth = 0
         crypto_net_worth = 0
         cad_rate = exchange_api.process_data()
@@ -80,12 +81,13 @@ def portfolio(request):
                         }
                     )
                     stock_net_worth += ticker_data["market_value"]
+                    output.append(ticker_data)
                 else:
                     ticker_data = coins_api.process_data(
                         {"ticker": ticker_item.ticker, "ticker_item": ticker_item}
                     )
                     crypto_net_worth += ticker_data["market_value"]
-                output.append(ticker_data)
+                    output_crypto.append(ticker_data)
             except Exception as e:
                 print(e.args)
 
@@ -93,9 +95,11 @@ def portfolio(request):
             request,
             "portfolio.html",
             {
+                "ticker": ticker,
                 "ticker_stock": ticker.filter(currency_type="stock"),
                 "ticker_crypto": ticker.filter(currency_type="crypto"),
-                "output": output,
+                "output_stock": output,
+                "output_crypto": output_crypto,
                 "stock_net_worth": round(stock_net_worth, 2),
                 "crypto_net_worth": round(crypto_net_worth, 2),
             },

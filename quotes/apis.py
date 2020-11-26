@@ -93,7 +93,7 @@ class CryptoAPI(APIHandler):
         if data.get("ticker_item", None) is not None:
             crypto_data["shares_owned"] = data["ticker_item"].shares_owned
             crypto_data["market_value"] = round(
-                data["ticker_item"].shares_owned * self.data["price"], 2
+                data["ticker_item"].shares_owned * crypto_data["price"], 2
             )
         return crypto_data
 
