@@ -63,6 +63,10 @@ def portfolio(request):
             messages.success(request, ("Stock Has Been Added!"))
             return redirect("portfolio")
 
+        else:
+            messages.error(request, "Form data is invalid.")
+            return redirect("portfolio")
+
     else:
         ticker = Stock.objects.all()
         output = []
