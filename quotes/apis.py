@@ -65,7 +65,7 @@ class IEXApi(APIHandler):
         if data.get("ticker_item", None) is not None:
             self.data["shares_owned"] = data["ticker_item"].shares_owned
             self.data["market_value"] = round(
-                data["ticker_item"].shares_owned * self.data["latestPrice"], 2
+                float(data["ticker_item"].shares_owned) * self.data["latestPrice"], 2
             )
         return self.data
 
