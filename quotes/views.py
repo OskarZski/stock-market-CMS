@@ -43,8 +43,10 @@ def portfolio(request):
 
     if request.method == "POST":
         form = StockForm(request.POST or None)
-
+        print(request.POST)
+        print(form.is_valid())
         if form.is_valid():
+            print(form.cleaned_data)
             ticker_name = form.cleaned_data.get("ticker")
             if not iexapi.ticker_available(ticker_name):
                 messages.error(
@@ -73,7 +75,6 @@ def portfolio(request):
                 output.append(ticker_data)
             except Exception as e:
                 print(e.args)
-                api = None
 
         return render(
             request,

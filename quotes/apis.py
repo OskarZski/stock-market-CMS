@@ -75,6 +75,8 @@ class CryptoAPI(APIHandler):
         self.url = self.original_url.format(data["ticker"])
         self.get()
         crypto_data = {}
+        crypto_data["name"] = self.data["name"]
+        crypto_data["symbol"] = self.data["symbol"]
         crypto_data["market_cap"] = self.data["market_data"]["market_cap"]["cad"]
         crypto_data["price"] = self.data["market_data"]["current_price"]["cad"]
         crypto_data["volume"] = self.data["market_data"]["total_volume"]["cad"]
