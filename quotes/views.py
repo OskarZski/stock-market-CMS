@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Stock
 from .forms import StockForm
-from .apis import ExchangeRateAPI, IEXApi
+from .apis import ExchangeRateAPI, IEXApi, CryptoAPI
 
 
 def home(request):
@@ -36,6 +36,7 @@ exchange_api = ExchangeRateAPI("https://api.exchangeratesapi.io/latest?base=USD"
 iexapi = IEXApi(
     "https://cloud.iexapis.com/stable/stock/{}/quote?token=pk_062031d20883444f9ea74e2610fe2011"
 )
+coins_api = CryptoAPI("https://api.coingecko.com/api/v3/coins/{}?market_data=true")
 
 
 def portfolio(request):

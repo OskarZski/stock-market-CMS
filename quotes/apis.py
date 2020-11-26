@@ -62,11 +62,30 @@ class IEXApi(APIHandler):
         self.data["ytdChange"] *= 100
         for field in self.convert_fields:
             self.data[field] = round(self.data[field] * data["cad_rate"], 2)
-        self.data["shares_owned"] = data["ticker_item"].shares_owned
-        self.data["market_value"] = round(
-            data["ticker_item"].shares_owned * self.data["latestPrice"], 2
-        )
+        if data.get("ticker_item", None) is not None:
+            self.data["shares_owned"] = data["ticker_item"].shares_owned
+            self.data["market_value"] = round(
+                data["ticker_item"].shares_owned * self.data["latestPrice"], 2
+            )
         return self.data
+
+
+class CryptoAPI(APIHandler):
+    def process_data(self, data):
+        self.url = self.original_url.format(data["ticker"])
+        self.get()
+        crypto_data = {}
+        crypto_data["market_cap"] = self.data["market_data"]["market_cap"]["cad"]
+        crypto_data["price"] = self.data["market_data"]["current_price"]["cad"]
+        crypto_data["volume"] = self.data["market_data"]["total_volume"]["cad"]
+        crypto_data["high_24"] = self.data["market_data"]["high_24h"]["cad"]
+        crypto_data["low_24"] = self.data["market_data"]["low_24h"]["cad"]
+        if data.get("ticker_item", None) is not None:
+            crypto_data["shares_owned"] = data["ticker_item"].shares_owned
+            crypto_data["market_value"] = round(
+                data["ticker_item"].shares_owned * self.data["price"], 2
+            )
+        return crypto_data
 
 
 class HTTP404NotFound(Exception):
