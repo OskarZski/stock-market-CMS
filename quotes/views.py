@@ -78,6 +78,7 @@ def portfolio(request):
     output_crypto = []
     stock_net_worth = 0
     crypto_net_worth = 0
+    globe_mail_items = []
     cad_rate = exchange_api.process_data()
     for ticker_item in ticker:
         try:
@@ -100,9 +101,8 @@ def portfolio(request):
                         )
                         return redirect("portfolio")
                     else:
-                        ticker_data = globe_scrapper.scrap_data(ticker_item, fund_type)
-                        stock_net_worth += ticker_data["market_value"]
-                        output.append(ticker_data)
+                        globe_mail_items.append((ticker_item, fund_type))
+
             else:
                 ticker_data = coins_api.process_data(
                     {"ticker": ticker_item.ticker, "ticker_item": ticker_item}
@@ -111,6 +111,11 @@ def portfolio(request):
                 output_crypto.append(ticker_data)
         except Exception as e:
             print(e.args)
+
+    if len(globe_mail_items) > 0:
+        data = globe_scrapper.scrap_bulk(globe_mail_items)
+        stock_net_worth += sum([x["market_value"] for x in data])
+        output.extend(data)
 
     return render(
         request,

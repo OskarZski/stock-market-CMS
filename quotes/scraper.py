@@ -93,19 +93,37 @@ class TheGlobeMailScarper:
             ),
         }
 
-    def scrap_data(self, ticker, type):
+    def scrap_bulk(self, tickers):
+        driver = webdriver.Firefox(
+            executable_path=GeckoDriverManager().install(),
+            options=self.firefox_options,
+        )
+
+        ret = []
+        for ticker, fund_type in tickers:
+            if fund_type == "funds":
+                data = self.scrap_funds(driver, ticker)
+                ret.append(data)
+            else:
+                data = self.scrap_stock(driver, ticker)
+                ret.append(data)
+
+        driver.quit()
+
+        return ret
+
+    def scrap_data(self, ticker, fund_type):
         firefox_profile = webdriver.FirefoxProfile(self.profile_path)
         driver = webdriver.Firefox(
             executable_path=GeckoDriverManager().install(),
             options=self.firefox_options,
             firefox_profile=firefox_profile,
         )
-        if type == "funds":
+        if fund_type == "funds":
             data = self.scrap_funds(driver, ticker)
         else:
             data = self.scrap_stock(driver, ticker)
 
-        print(type, data)
         driver.quit()
 
         return data
