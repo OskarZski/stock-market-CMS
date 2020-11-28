@@ -111,6 +111,7 @@ def portfolio(request):
                 crypto_net_worth += ticker_data["market_value"]
                 output_crypto.append(ticker_data)
         except Exception as e:
+            print(e)
             print(e.args)
 
     return render(

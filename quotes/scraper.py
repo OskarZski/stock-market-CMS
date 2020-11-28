@@ -1,8 +1,9 @@
 # Requires installing `selenium` and `webdriver_manager` via pip
 
+import os
 import requests
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 
 
 class TheGlobeMailScarper:
@@ -10,9 +11,13 @@ class TheGlobeMailScarper:
     STOCKS_URL = "https://www.theglobeandmail.com/investing/markets/stocks/{}/"
 
     def __init__(self):
-        self.chrome_options = webdriver.ChromeOptions()
-        self.chrome_options.add_argument("--headless")
-        self.chrome_options.add_argument("--log-level=3")
+        self.profile_path = "D:/dev/Upwork-Assignments/stock-market-CMS/ff_profile"
+        if not os.path.exists(self.profile_path):
+            os.makedirs(self.profile_path)
+
+        self.firefox_options = webdriver.FirefoxOptions()
+        self.firefox_options.add_argument("--headless")
+        self.firefox_options.add_argument("--log-level=3")
 
     def check_availability(self, symbol=None):
         if symbol is None:
@@ -83,9 +88,11 @@ class TheGlobeMailScarper:
         }
 
     def scrap_data(self, ticker, type):
-        driver = webdriver.Chrome(
-            executable_path=ChromeDriverManager().install(),
-            options=self.chrome_options,
+        firefox_profile = webdriver.FirefoxProfile(self.profile_path)
+        driver = webdriver.Firefox(
+            executable_path=GeckoDriverManager().install(),
+            options=self.firefox_options,
+            firefox_profile=firefox_profile,
         )
         if type == "funds":
             data = self.scrap_funds(driver, ticker)
