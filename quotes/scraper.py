@@ -9,6 +9,15 @@ class TheGlobeMailScarper:
     FUNDS_URL = "https://www.theglobeandmail.com/investing/markets/funds/{}/"
     STOCKS_URL = "https://www.theglobeandmail.com/investing/markets/stocks/{}/"
 
+    def __init__(self):
+        self.chrome_options = webdriver.ChromeOptions()
+        self.chrome_options.add_argument("--headless")
+        self.chrome_options.add_argument("--log-level=3")
+        self.driver = webdriver.Chrome(
+            executable_path=ChromeDriverManager().install(),
+            options=self.chrome_options,
+        )
+
     def check_availability(self, symbol=None):
         if symbol is None:
             return None
@@ -20,20 +29,25 @@ class TheGlobeMailScarper:
             return "stock"
         return None
 
-    def scrap_funds(self, driver, ticker):
-        last_price_el = driver.find_element_by_xpath(
+    def scrap_funds(self, ticker):
+        self.driver.get(self.FUNDS_URL.format(ticker.ticker))
+        last_price_el = self.driver.find_element_by_xpath(
             '//barchart-field[@name="lastPrice"]'
         )
-        prev_price_el = driver.find_element_by_xpath(
+        prev_price_el = self.driver.find_element_by_xpath(
             '//barchart-field[@name="previousPrice"]'
         )
-        company_name_el = driver.find_element_by_xpath('//span[@id="instrument-name"]')
-        symbol_el = driver.find_element_by_xpath('//span[@id="instrument-symbol"]')
-        ytd_exchange_el = driver.find_element_by_xpath(
+        company_name_el = self.driver.find_element_by_xpath(
+            '//span[@id="instrument-name"]'
+        )
+        symbol_el = self.driver.find_element_by_xpath('//span[@id="instrument-symbol"]')
+        ytd_exchange_el = self.driver.find_element_by_xpath(
             '//td[@data-barchart-field="returnYtd"]'
         )
 
-        ret = {
+        self.driver.close()
+
+        return {
             "latestPrice": last_price_el.text,
             "previousClose": prev_price_el.text,
             "companyName": company_name_el.text,
@@ -43,24 +57,41 @@ class TheGlobeMailScarper:
             "market_value": float(ticker.shares_owned) * float(last_price_el.text),
         }
 
-        driver.quit()
+    def scrap_stock(self, ticker):
+        self.driver.get(self.STOCKS_URL.format(ticker.ticker))
+        last_price_el = self.driver.find_element_by_xpath(
+            '//barchart-field[@name="lastPrice"]'
+        )
+        prev_price_el = self.driver.find_element_by_xpath(
+            '//barchart-field[@name="previousPrice"]'
+        )
+        high_price_1y = self.driver.find_element_by_xpath(
+            '//barchart-field[@name="highPrice1y"]'
+        )
+        low_price_1y = self.driver.find_element_by_xpath(
+            '//barchart-field[@name="lowPrice1y"]'
+        )
+        company_name_el = self.driver.find_element_by_xpath(
+            '//span[@id="instrument-name"]'
+        )
+        symbol_el = self.driver.find_element_by_xpath('//span[@id="instrument-symbol"]')
 
-        return ret
+        self.driver.close()
 
-    def scrap_stock(self, driver, ticker):
-        pass
+        return {
+            "latestPrice": last_price_el.text,
+            "previousClose": prev_price_el.text,
+            "companyName": company_name_el.text,
+            "symbol": symbol_el.text,
+            "week52Low": low_price_1y.text,
+            "week52High": high_price_1y.text,
+            "shares_owned": ticker.shares_owned,
+            "market_value": float(ticker.shares_owned) * float(last_price_el.text),
+        }
 
     def scrap_data(self, ticker, type):
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--log-level=3")
-        driver = webdriver.Chrome(
-            executable_path=ChromeDriverManager().install(),
-            options=chrome_options,
-        )
+
         if type == "funds":
-            driver.get(self.FUNDS_URL.format(ticker.ticker))
-            return self.scrap_funds(driver, ticker)
+            return self.scrap_funds(ticker)
         else:
-            driver.get(self.STOCKS_URL.format(ticker.ticker))
-            return self.scrap_stock(driver, ticker)
+            return self.scrap_stock(ticker)
