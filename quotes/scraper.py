@@ -30,6 +30,12 @@ class TheGlobeMailScarper:
             return "stock"
         return None
 
+    def _cast_data(self, value, cast_type):
+        try:
+            return cast_type(value)
+        except:
+            return None
+
     def scrap_funds(self, driver, ticker):
 
         driver.get(self.FUNDS_URL.format(ticker.ticker))
@@ -46,11 +52,11 @@ class TheGlobeMailScarper:
         )
 
         return {
-            "latestPrice": last_price_el.text,
-            "previousClose": prev_price_el.text,
+            "latestPrice": self._cast_data(last_price_el.text, float),
+            "previousClose": self._cast_data(prev_price_el.text, float),
             "companyName": company_name_el.text,
             "symbol": symbol_el.text,
-            "ytdChange": float(ytd_exchange_el.text.replace("%", "")),
+            "ytdChange": self._cast_data(ytd_exchange_el.text.replace("%", ""), float),
             "shares_owned": ticker.shares_owned,
             "market_value": round(
                 float(ticker.shares_owned) * float(last_price_el.text), 2
@@ -75,12 +81,12 @@ class TheGlobeMailScarper:
         symbol_el = driver.find_element_by_xpath('//span[@id="instrument-symbol"]')
         print(last_price_el.text)
         return {
-            "latestPrice": last_price_el.text,
-            "previousClose": prev_price_el.text,
+            "latestPrice": self._cast_data(last_price_el.text, float),
+            "previousClose": self._cast_data(prev_price_el.text, float),
             "companyName": company_name_el.text,
             "symbol": symbol_el.text,
-            "week52Low": low_price_1y.text,
-            "week52High": high_price_1y.text,
+            "week52Low": self._cast_data(low_price_1y.text, float),
+            "week52High": self._cast_data(high_price_1y.text, float),
             "shares_owned": ticker.shares_owned,
             "market_value": round(
                 float(ticker.shares_owned) * float(last_price_el.text), 2

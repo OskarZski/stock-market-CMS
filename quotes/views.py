@@ -100,7 +100,6 @@ def portfolio(request):
                         )
                         return redirect("portfolio")
                     else:
-                        print(fund_type)
                         ticker_data = globe_scrapper.scrap_data(ticker_item, fund_type)
                         stock_net_worth += ticker_data["market_value"]
                         output.append(ticker_data)
@@ -111,7 +110,6 @@ def portfolio(request):
                 crypto_net_worth += ticker_data["market_value"]
                 output_crypto.append(ticker_data)
         except Exception as e:
-            print(e)
             print(e.args)
 
     return render(
