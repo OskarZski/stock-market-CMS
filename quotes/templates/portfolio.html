@@ -48,10 +48,24 @@
             <td>{{ list_item.symbol }}</td>
             <td>${{ list_item.latestPrice|intcomma }}</td>
             <td>${{ list_item.previousClose|intcomma }}</td>
+            {% if list_item.marketCap %}
             <td>${{ list_item.marketCap|intcomma }}</td>
+            {% else %}
+            <td>-</td>
+            {% endif %}
             <td>{{ list_item.ytdChange|floatformat:2  }}%</td>
+            {% if list_item.week52High %}
             <td>${{ list_item.week52High|intcomma }}</td>
+            {% else %}
+            <td>-</td>
+            {% endif %}
+
+            {% if list_item.week52Low %}
             <td>${{ list_item.week52Low|intcomma }}</td>
+            {% else %}
+            <td>-</td>
+            {% endif %}
+
             <td>{{ list_item.shares_owned }}</td>
             <td>${{ list_item.market_value|intcomma }}</td>
         </tr>
