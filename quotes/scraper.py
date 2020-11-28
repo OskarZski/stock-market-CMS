@@ -22,12 +22,12 @@ class TheGlobeMailScarper:
     def check_availability(self, symbol=None):
         if symbol is None:
             return None
-        stocks_check = requests.get(self.STOCKS_URL.format(symbol))
-        if stocks_check.status_code == 200:
-            return "stock"
         funds_check = requests.get(self.FUNDS_URL.format(symbol))
         if funds_check.status_code == 200:
             return "funds"
+        stocks_check = requests.get(self.STOCKS_URL.format(symbol))
+        if stocks_check.status_code == 200:
+            return "stock"
         return None
 
     def scrap_funds(self, driver, ticker):
