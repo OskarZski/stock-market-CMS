@@ -3,6 +3,7 @@ from django.contrib import messages
 from .models import Stock
 from .forms import StockForm
 from .apis import ExchangeRateAPI, IEXApi, CryptoAPI
+from .scraper import TheGlobeMailScarper
 
 
 def home(request):
@@ -37,6 +38,7 @@ iexapi = IEXApi(
     "https://cloud.iexapis.com/stable/stock/{}/quote?token=pk_062031d20883444f9ea74e2610fe2011"
 )
 coins_api = CryptoAPI("https://api.coingecko.com/api/v3/coins/{}?market_data=true")
+globe_scrapper = TheGlobeMailScarper()
 
 
 def portfolio(request):
@@ -46,11 +48,15 @@ def portfolio(request):
         if form.is_valid():
             ticker_name = form.cleaned_data.get("ticker")
             currency_type = form.cleaned_data.get("currency_type")
-            if currency_type == "stock" and not iexapi.ticker_available(ticker_name):
-                messages.error(
-                    request, f"Couldn't find stock with ticker `{ticker_name}`!"
-                )
-                return redirect("portfolio")
+            if currency_type == "stock":
+                if (
+                    not iexapi.ticker_available(ticker_name)
+                    and globe_scrapper.check_availability(ticker_name) == False
+                ):
+                    messages.error(
+                        request, f"Couldn't find stock with ticker `{ticker_name}`!"
+                    )
+                    return redirect("portfolio")
 
             elif currency_type == "crypto" and not coins_api.ticker_available(
                 ticker_name
