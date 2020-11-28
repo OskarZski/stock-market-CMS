@@ -11,28 +11,16 @@ class TheGlobeMailScarper:
 
     def check_availability(self, symbol=None):
         if symbol is None:
-            return False
+            return None
         funds_check = requests.get(self.FUNDS_URL.format(symbol))
         if funds_check.status_code == 200:
-            return True, "funds"
+            return "funds"
         stocks_check = requests.get(self.STOCKS_URL.format(symbol))
         if stocks_check.status_code == 200:
-            return True, "stock"
-        return False
+            return "stock"
+        return None
 
-    def scrap_data(self, symbol, type):
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--log-level=3")
-        driver = webdriver.Chrome(
-            executable_path=ChromeDriverManager().install(),
-            options=chrome_options,
-        )
-        if type == "funds":
-            driver.get(self.FUNDS_URL.format(symbol))
-        else:
-            driver.get(self.STOCKS_URL.format(symbol))
-
+    def scrap_funds(self, driver, ticker):
         last_price_el = driver.find_element_by_xpath(
             '//barchart-field[@name="lastPrice"]'
         )
@@ -46,13 +34,33 @@ class TheGlobeMailScarper:
         )
 
         ret = {
-            "lastPrice": last_price_el.text,
+            "latestPrice": last_price_el.text,
             "previousClose": prev_price_el.text,
             "companyName": company_name_el.text,
             "symbol": symbol_el.text,
-            "ytdChange": float(ytd_exchange_el.text.replace("%", "")) / 100,
+            "ytdChange": float(ytd_exchange_el.text.replace("%", "")),
+            "shares_owned": ticker.shares_owned,
+            "market_value": float(ticker.shares_owned) * float(last_price_el.text),
         }
 
         driver.quit()
 
         return ret
+
+    def scrap_stock(self, driver, ticker):
+        pass
+
+    def scrap_data(self, ticker, type):
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--log-level=3")
+        driver = webdriver.Chrome(
+            executable_path=ChromeDriverManager().install(),
+            options=chrome_options,
+        )
+        if type == "funds":
+            driver.get(self.FUNDS_URL.format(ticker.ticker))
+            return self.scrap_funds(driver, ticker)
+        else:
+            driver.get(self.STOCKS_URL.format(ticker.ticker))
+            return self.scrap_stock(driver, ticker)

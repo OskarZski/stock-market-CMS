@@ -51,7 +51,7 @@ def portfolio(request):
             if currency_type == "stock":
                 if (
                     not iexapi.ticker_available(ticker_name)
-                    and globe_scrapper.check_availability(ticker_name) == False
+                    and globe_scrapper.check_availability(ticker_name) is None
                 ):
                     messages.error(
                         request, f"Couldn't find stock with ticker `{ticker_name}`!"
@@ -73,16 +73,16 @@ def portfolio(request):
             messages.error(request, "Form data is invalid.")
             return redirect("portfolio")
 
-    else:
-        ticker = Stock.objects.all()
-        output = []
-        output_crypto = []
-        stock_net_worth = 0
-        crypto_net_worth = 0
-        cad_rate = exchange_api.process_data()
-        for ticker_item in ticker:
-            try:
-                if ticker_item.currency_type == "stock":
+    ticker = Stock.objects.all()
+    output = []
+    output_crypto = []
+    stock_net_worth = 0
+    crypto_net_worth = 0
+    cad_rate = exchange_api.process_data()
+    for ticker_item in ticker:
+        try:
+            if ticker_item.currency_type == "stock":
+                if iexapi.ticker_available(ticker_item.ticker):
                     ticker_data = iexapi.process_data(
                         {
                             "cad_rate": cad_rate,
@@ -93,27 +93,38 @@ def portfolio(request):
                     stock_net_worth += ticker_data["market_value"]
                     output.append(ticker_data)
                 else:
-                    ticker_data = coins_api.process_data(
-                        {"ticker": ticker_item.ticker, "ticker_item": ticker_item}
-                    )
-                    crypto_net_worth += ticker_data["market_value"]
-                    output_crypto.append(ticker_data)
-            except Exception as e:
-                print(e.args)
+                    fund_type = globe_scrapper.check_availability(ticker_item.ticker)
+                    if fund_type == False:
+                        messages.error(
+                            request, f"Something wrong with {ticker_item.ticker}"
+                        )
+                        return redirect("portfolio")
+                    else:
+                        ticker_data = globe_scrapper.scrap_data(ticker_item, fund_type)
+                        stock_net_worth += ticker_data["market_value"]
+                        output.append(ticker_data)
+            else:
+                ticker_data = coins_api.process_data(
+                    {"ticker": ticker_item.ticker, "ticker_item": ticker_item}
+                )
+                crypto_net_worth += ticker_data["market_value"]
+                output_crypto.append(ticker_data)
+        except Exception as e:
+            print(e.args)
 
-        return render(
-            request,
-            "portfolio.html",
-            {
-                "ticker": ticker,
-                "ticker_stock": ticker.filter(currency_type="stock"),
-                "ticker_crypto": ticker.filter(currency_type="crypto"),
-                "output_stock": output,
-                "output_crypto": output_crypto,
-                "stock_net_worth": round(stock_net_worth, 2),
-                "crypto_net_worth": round(crypto_net_worth, 2),
-            },
-        )
+    return render(
+        request,
+        "portfolio.html",
+        {
+            "ticker": ticker,
+            "ticker_stock": ticker.filter(currency_type="stock"),
+            "ticker_crypto": ticker.filter(currency_type="crypto"),
+            "output_stock": output,
+            "output_crypto": output_crypto,
+            "stock_net_worth": round(stock_net_worth, 2),
+            "crypto_net_worth": round(crypto_net_worth, 2),
+        },
+    )
 
 
 def delete(request, stock_id):
