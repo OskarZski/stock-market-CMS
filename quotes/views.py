@@ -94,12 +94,13 @@ def portfolio(request):
                     output.append(ticker_data)
                 else:
                     fund_type = globe_scrapper.check_availability(ticker_item.ticker)
-                    if fund_type == False:
+                    if fund_type is None:
                         messages.error(
                             request, f"Something wrong with {ticker_item.ticker}"
                         )
                         return redirect("portfolio")
                     else:
+                        print(fund_type)
                         ticker_data = globe_scrapper.scrap_data(ticker_item, fund_type)
                         stock_net_worth += ticker_data["market_value"]
                         output.append(ticker_data)

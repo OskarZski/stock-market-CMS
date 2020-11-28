@@ -53,7 +53,11 @@
             {% else %}
             <td>-</td>
             {% endif %}
+            {% if list_item.ytdChange %}
             <td>{{ list_item.ytdChange|floatformat:2  }}%</td>
+            {% else %}
+            <td>-</td>
+            {% endif %}
             {% if list_item.week52High %}
             <td>${{ list_item.week52High|intcomma }}</td>
             {% else %}
